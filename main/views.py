@@ -5,7 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect
-
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
 from main.forms import LoginForm, AddSnippetForm
 from main.models import Snippet
 
@@ -59,9 +61,11 @@ def view_snippet_page(request, id):
             initial={
                 'user': "Anonymous User" if record.user is None else request.user.username,
                 'name': record.name,
-                'code': record.code,
             }
         )
+        context["code"] = highlight(record.code, PythonLexer(), HtmlFormatter())
+        context["code_css"] = HtmlFormatter().get_style_defs(".highlight")
+
     except Snippet.DoesNotExist:
         raise Http404
     return render(request, 'pages/view_snippet.html', context)
@@ -89,9 +93,8 @@ def logout_page(request):
     messages.add_message(request, messages.INFO, "Вы успешно вышли из аккаунта")
     return redirect('index')
 
-
+@login_required(login_url=login_page)
 def my_snippets_page(request):
-    context: dict = {
-        "pagename": "Мои сниппеты"
-    }
+    context: dict = get_base_context(request=request, pagename="Мои сниппеты")
+    context["data"] = Snippet.objects.filter(user=request.user)
     return render(request, "pages/my_snippets.html", context)

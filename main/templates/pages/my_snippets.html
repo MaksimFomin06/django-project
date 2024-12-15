@@ -1,14 +1,24 @@
 {% extends 'base.html' %}
 
-{% block pagename %}
-  <div class="row">
-    <div class="col text-left">
-      <h1>{{ pagename }}</h1>
-    </div>
-  </div>
-{% endblock %}
 {% block content %}
-<div>
-    
-</div>
-{% endblock content %}
+  <table class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Название</th>
+        <th scope="col">Дата создания</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data_items in data %}
+        <tr>
+          <th>{{ data_items.id }}</th>
+          <td>
+            <a href="/snippets/{{ data_items.id }}">{{ data_items.name }}</a>
+          </td>
+          <td>{{ data_items.creation_date }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
